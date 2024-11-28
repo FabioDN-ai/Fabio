@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sondaggio: Sei Stupido?</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .container {
+      text-align: center;
+      background-color: white;
+      padding: 20px;
+      box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    .result-section {
+      margin-top: 20px;
+      background-color: #f1f1f1;
+      padding: 10px;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Sondaggio: Sei stupido?</h1>
+    <form id="surveyForm">
+      <p>Vota una delle seguenti opzioni:</p>
+      <label>
+        <input type="radio" name="response" value="si"> Sì
+      </label>
+      <label>
+        <input type="radio" name="response" value="no"> No
+      </label>
+      <br><br>
+      <button type="submit">Vota</button>
+    </form>
+    
+    <div class="result-section" id="resultSection" style="display:none;">
+      <h2>Risultati del sondaggio</h2>
+      <div id="pollResults">
+        <p><strong>Sì:</strong> 0%</p>
+        <p><strong>No:</strong> 0%</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const surveyForm = document.getElementById("surveyForm");
+    const resultSection = document.getElementById("resultSection");
+    const pollResults = document.getElementById("pollResults");
+
+    // Funzione per recuperare i voti dal localStorage (se esistono)
+    function getVotes() {
+      const votes = JSON.parse(localStorage.getItem("votes")) || { si: 0, no: 0 };
+      return votes;
+    }
+
+    // Funzione per aggiornare e visualizzare i risultati
+    function updateResults() {
+      const votes = getVotes();
+      const totalVotes = votes.si + votes.no;
+      
+      // Se ci sono voti, calcola e mostra le percentuali
+      if (totalVotes > 0) {
+        const siPercentage = (votes.si / totalVotes) * 100;
+        const noPercentage = (votes.no / totalVotes) * 100;
+
+        // Mostra i risultati
+        pollResults.innerHTML = `
+          <p><strong>Sì:</strong> ${siPercentage.toFixed(2)}%</p>
+          <p><strong>No:</strong> ${noPercentage.toFixed(2)}%</p>
+        `;
+      } else {
+        // Se non ci sono ancora voti
+        pollResults.innerHTML = `
+          <p><strong>Sì:</strong> 0%</p>
+          <p><strong>No:</strong> 0%</p>
+        `;
+      }
+    }
+
+    // Gestione del voto
+    surveyForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+
+      const userVote = document.querySelector('input[name="response"]:checked');
+      if (userVote) {
+        const vote = userVote.value;
+
+        // Recupera i voti esistenti dal localStorage
+        const votes = getVotes();
+
+        // Aumenta il voto corrispondente
+        votes[vote]++;
+
+        // Salva i nuovi voti nel localStorage
+        localStorage.setItem("votes", JSON.stringify(votes));
+
+        // Nascondi il form e mostra i risultati
+        surveyForm.style.display = "none";
+        resultSection.style.display = "block";
+
+        // Aggiorna e mostra i risultati in tempo reale
+        updateResults();
+      } else {
+        alert("Per favore, scegli una risposta.");
+      }
+    });
+
+    // Carica i risultati quando la pagina si carica
+    updateResults();
+  </script>
+</body>
+</html>
